@@ -7,22 +7,24 @@
   <link rel="icon" href="resources/images/icons/favicon-white.png" type="image/png" media="(prefers-color-scheme: dark)">
   <link rel="apple-touch-icon" href="resources/images/icons/apple-touch-icon.png">
   <link rel="apple-touch-icon" href="resources/images/icons/apple-touch-icon-dark.png" media="(prefers-color-scheme: dark)">
-  <title>Social | Brian Crink </title>
+  <title>Social | Brian Crink</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
       font-family: 'Inter', system-ui, sans-serif;
       margin: 0;
-      padding: 40px 20px;
+      padding: 100px 20px;
       min-height: 100vh;
       background: #000000;
       color: #ffffff;
       display: flex;
-      align-items: flex-start;      /* flex-start or center */
+      align-items: flex-start;
       justify-content: center;
       line-height: 1.6;
-      transition: background 0.4s;
+      transition: background 0.4s, color 0.4s;
       opacity: 0;
       animation: fadeIn 1.3s forwards;
     }
@@ -32,12 +34,145 @@
       to   { opacity: 1; }
     }
 
-    .container { 
-      max-width: 620px; 
-      width: 100%; 
+    .container {
+      position: relative;
+      max-width: 620px;
+      width: 100%;
       text-align: center;
-      margin-top: 120px;             /* Content height */
-     }
+      margin-top: 24px;
+    }
+
+    @property --pc1 { syntax: '<color>'; inherits: false; initial-value: #ff006e; }
+    @property --pc2 { syntax: '<color>'; inherits: false; initial-value: #8338ec; }
+    @property --pc3 { syntax: '<color>'; inherits: false; initial-value: #3a86ff; }
+    @property --pc4 { syntax: '<color>'; inherits: false; initial-value: #06d6a0; }
+    @property --pc5 { syntax: '<color>'; inherits: false; initial-value: #ffbe0b; }
+
+    @keyframes portalChromaFade {
+      0%   { --pc1: #ff006e; --pc2: #8338ec; --pc3: #3a86ff; --pc4: #06d6a0; --pc5: #ffbe0b; }
+      20%  { --pc1: #ffbe0b; --pc2: #ff006e; --pc3: #8338ec; --pc4: #3a86ff; --pc5: #06d6a0; }
+      40%  { --pc1: #06d6a0; --pc2: #ffbe0b; --pc3: #ff006e; --pc4: #8338ec; --pc5: #3a86ff; }
+      60%  { --pc1: #3a86ff; --pc2: #06d6a0; --pc3: #ffbe0b; --pc4: #ff006e; --pc5: #8338ec; }
+      80%  { --pc1: #8338ec; --pc2: #3a86ff; --pc3: #06d6a0; --pc4: #ffbe0b; --pc5: #ff006e; }
+      100% { --pc1: #ff006e; --pc2: #8338ec; --pc3: #3a86ff; --pc4: #06d6a0; --pc5: #ffbe0b; }
+    }
+
+    .site-nav-link.portal {
+      background-image: linear-gradient(
+        90deg,
+        var(--pc1),
+        var(--pc2),
+        var(--pc3),
+        var(--pc4),
+        var(--pc5)
+      );
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      -webkit-text-fill-color: transparent;
+      animation: portalChromaFade 8s linear infinite;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .site-nav-link.portal {
+        animation: none;
+      }
+    }
+
+    .site-nav {
+      margin: 0;
+      color: #ffffff;
+      font-size: 1rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      white-space: nowrap;
+      letter-spacing: 0.16rem;
+    }
+
+    body.light .site-nav {
+      color: #1a1a1a;
+    }
+
+    .site-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.55rem;
+      margin: 0;
+    }
+
+    .site-nav .portal {
+      text-transform: uppercase;
+      font-size: 0.95rem;
+      letter-spacing: 0.08rem;
+    }
+
+    .site-nav .nav-dot {
+      color: #ffffff;
+      font-weight: 400;
+      font-size: 1.0rem;
+      line-height: 1;
+      letter-spacing: 0;
+    }
+
+    body.light .site-nav .nav-dot {
+      color: #000000;
+    }
+
+    .site-nav-link {
+      color: inherit;
+      text-decoration: none;
+      cursor: pointer;
+      transition: opacity 0.2s ease;
+    }
+
+    .site-nav-link:hover {
+      opacity: 0.85;
+    }
+
+    .map-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: inherit;
+      text-decoration: none;
+      line-height: 0;
+    }
+
+    .map-link:hover {
+      opacity: 0.85;
+    }
+
+    .map-icon {
+      width: 3.0rem;
+      height: 3.0rem;
+      display: block;
+    }
+
+    .name {
+      font-size: 3.0rem;
+      font-weight: 600;
+      color: #ffffff;
+      margin: 0 0 15px 0;
+      letter-spacing: -0.5px;
+    }
+
+    body.light .name {
+      color: #1a1a1a;
+    }
+
+    .name-link {
+      color: inherit;
+      text-decoration: none;
+      cursor: pointer;
+      transition: opacity 0.2s ease;
+    }
+
+    .name-link:hover {
+      opacity: 0.85;
+    }
 
     h2 {
       font-size: 1.8rem;
@@ -67,6 +202,10 @@
     body.light h2 { color: #1a1a1a; }
 
     .toggle-btn {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 10;
       background: transparent;
       border: none;
       width: 48px;
@@ -75,37 +214,85 @@
       padding: 8px;
       border-radius: 50%;
       transition: transform 0.3s;
-      margin: 60px auto 0;
+      margin: 0;
       display: block;
+      color: #ffffff;
     }
 
     .toggle-btn:hover {
       transform: rotate(20deg);
     }
 
+    body.light .toggle-btn {
+      color: #1a1a1a;
+    }
+
     .toggle-btn svg {
       width: 28px;
       height: 28px;
-      fill: currentColor;
+      display: block;
+    }
+
+    @media (max-width: 768px) {
+      .toggle-btn {
+        top: 16px;
+        right: 12px;
+      }
     }
   </style>
 </head>
 <body>
   <div class="container">
+    <button class="toggle-btn" id="theme-toggle" type="button" aria-label="Dark mode">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.15"/><line x1="12" y1="2.4" x2="12" y2="5.1"/><line x1="12" y1="18.9" x2="12" y2="21.6"/><line x1="2.4" y1="12" x2="5.1" y2="12"/><line x1="18.9" y1="12" x2="21.6" y2="12"/><line x1="5.2" y1="5.2" x2="7.1" y2="7.1"/><line x1="16.9" y1="16.9" x2="18.8" y2="18.8"/><line x1="18.8" y1="5.2" x2="16.9" y2="7.1"/><line x1="7.1" y1="16.9" x2="5.2" y2="18.8"/></svg>
+    </button>
+
+    <div class="site-nav">
+      <p class="site-link">
+        <a href="https://portal.briancrink.com" class="site-nav-link portal">Portal</a>
+        <span class="nav-dot" aria-hidden="true">•</span>
+        <a href="https://site.briancrink.com/map" class="map-link" aria-label="Site map"><svg class="map-icon" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <clipPath id="mapFillPortal"><path d="M3.15 7.85 L8.85 4.55 L15.05 8.05 L20.7 4.75 L20.7 16.25 L15.05 19.55 L8.85 16.05 L3.15 19.35 Z"/></clipPath>
+              <g clip-path="url(#mapFillPortal)">
+                <path d="M3.15 7.85 L8.85 4.55 L15.05 8.05 L20.7 4.75 L20.7 16.25 L15.05 19.55 L8.85 16.05 L3.15 19.35 Z" fill="#3f8f4e"/>
+                <path d="M3.15 19.35 C 8.85 11.05, 15.05 13.8, 20.7 8.75 V 14.65 C 18.9 15.9, 16.15 18.4, 14.85 19.35 L 3.15 19.35 Z" fill="#3a86ff"/>
+              </g>
+              <path d="M3.15 7.85 L8.85 4.55 L15.05 8.05 L20.7 4.75 L20.7 16.25 L15.05 19.55 L8.85 16.05 L3.15 19.35 Z" fill="none" stroke="rgba(47, 58, 51, 0.32)" stroke-width="0.85"/>
+              <line x1="8.85" y1="6.2" x2="8.85" y2="14.4" stroke="rgba(255,255,255,0.62)" stroke-width="0.36" stroke-linecap="round" stroke-dasharray="0.42 2.25"/>
+              <line x1="15.05" y1="9.7" x2="15.05" y2="17.9" stroke="rgba(255,255,255,0.62)" stroke-width="0.36" stroke-linecap="round" stroke-dasharray="0.42 2.25"/>
+              <g class="map-compass">
+                <circle cx="6.114" cy="14.75" r="2.38" fill="#ffffff" stroke="#2eb5e8" stroke-width="0.58"/>
+                <circle cx="6.114" cy="14.75" r="2.07" fill="none" stroke="#1b94d0" stroke-width="0.16"/>
+                <line x1="6.114" y1="13.02" x2="6.114" y2="12.68" stroke="#9ecce4" stroke-width="0.22" stroke-linecap="round"/>
+                <line x1="6.114" y1="16.48" x2="6.114" y2="16.82" stroke="#9ecce4" stroke-width="0.22" stroke-linecap="round"/>
+                <line x1="4.384" y1="14.75" x2="4.044" y2="14.75" stroke="#9ecce4" stroke-width="0.22" stroke-linecap="round"/>
+                <line x1="7.844" y1="14.75" x2="8.184" y2="14.75" stroke="#9ecce4" stroke-width="0.22" stroke-linecap="round"/>
+                <path d="M7.259 13.605 L5.605 14.241 L6.623 15.259 Z" fill="#ef4a3c"/>
+                <path d="M4.969 15.895 L5.605 14.241 L6.623 15.259 Z" fill="#33b7e8"/>
+                <circle cx="6.114" cy="14.75" r="0.46" fill="#ffffff"/>
+              </g>
+              <line x1="19.545" y1="13.689" x2="22.395" y2="16.539" stroke="#e0b36a" stroke-width="1.85" stroke-linecap="round"/>
+              <circle cx="16.858" cy="11.002" r="2.85" fill="rgba(90, 190, 255, 0.38)" stroke="#8b9098" stroke-width="0.82"/>
+            </svg></a>
+      </p>
+    </div>
+
+    <h1 class="name"><a href="https://briancrink.com" class="name-link">Brian Crink</a></h1>
+
     <h2>Follow</h2>
     <div class="icons">
-      <a href="https://x.com/briancrink" class="icon" 
-         data-light="resources/images/icons/dark/x.png" 
+      <a href="https://x.com/briancrink" class="icon"
+         data-light="resources/images/icons/dark/x.png"
          data-dark="resources/images/icons/light/x.png">
         <img src="resources/images/icons/color/x.png" alt="X" width="45" height="45">
       </a>
-      <a href="https://threads.net/@briancrink" class="icon" 
-         data-light="resources/images/icons/dark/threads.png" 
+      <a href="https://threads.net/@briancrink" class="icon"
+         data-light="resources/images/icons/dark/threads.png"
          data-dark="resources/images/icons/light/threads.png">
-        <img src="/resources/images/icons/color/threads.png" alt="Threads" width="45" height="45">
+        <img src="resources/images/icons/color/threads.png" alt="Threads" width="45" height="45">
       </a>
-      <a href="https://instagram.com/briancrink" class="icon" 
-         data-light="resources/images/icons/dark/instagram.png" 
+      <a href="https://instagram.com/briancrink" class="icon"
+         data-light="resources/images/icons/dark/instagram.png"
          data-dark="resources/images/icons/light/instagram.png">
         <img src="resources/images/icons/light/instagram.png" alt="Instagram" width="40" height="40">
       </a>
@@ -118,60 +305,46 @@
 
     <h2>Join</h2>
     <div class="icons">
-      <a href="https://access.edu" class="icon" 
-         data-light="resources/images/icons/dark/accessedu.png" 
+      <a href="https://access.edu" class="icon"
+         data-light="resources/images/icons/dark/accessedu.png"
          data-dark="resources/images/icons/light/accessedu.png">
         <img src="resources/images/icons/dark/accessedu.png" alt="AccessEdu" width="45" height="45">
       </a>
       <!-- Add more... -->
     </div>
-
-    <button class="toggle-btn" id="theme-toggle"
-            data-light="resources/images/icons/moon.png"
-            data-dark="resources/images/icons/sun.png">
-      <!-- Default Sun (inline SVG) -->
-      <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
-        <circle cx="12" cy="12" r="5"/>
-        <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
-      </svg>
-    </button>
   </div>
 
   <script>
     const toggleBtn = document.getElementById('theme-toggle');
     const body = document.body;
 
-    function updateAllIcons() {
+    const sunIcon = `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.15"/><line x1="12" y1="2.4" x2="12" y2="5.1"/><line x1="12" y1="18.9" x2="12" y2="21.6"/><line x1="2.4" y1="12" x2="5.1" y2="12"/><line x1="18.9" y1="12" x2="21.6" y2="12"/><line x1="5.2" y1="5.2" x2="7.1" y2="7.1"/><line x1="16.9" y1="16.9" x2="18.8" y2="18.8"/><line x1="18.8" y1="5.2" x2="16.9" y2="7.1"/><line x1="7.1" y1="16.9" x2="5.2" y2="18.8"/></svg>`;
+    const moonIcon = `<svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 14.35A9 9 0 1 1 9.65 3 7.15 7.15 0 0 0 21 14.35z"/></svg>`;
+
+    function setToggleIcon() {
+      const isLight = body.classList.contains('light');
+      toggleBtn.innerHTML = isLight ? moonIcon : sunIcon;
+      toggleBtn.setAttribute('aria-label', isLight ? 'Dark mode' : 'Light mode');
+    }
+
+    function updateSocialIcons() {
       const isLight = body.classList.contains('light');
       const mode = isLight ? 'light' : 'dark';
-
       document.querySelectorAll('.icon').forEach(icon => {
         const img = icon.querySelector('img');
         const newSrc = icon.getAttribute(`data-${mode}`);
-        if (newSrc) img.src = newSrc;
+        if (newSrc && img) img.src = newSrc;
       });
-
-      const toggleSrc = toggleBtn.getAttribute(`data-${mode}`);
-      toggleBtn.innerHTML = `<img src="${toggleSrc}" alt="${isLight ? 'Dark' : 'Light'} mode" width="28" height="28">`;
     }
 
     toggleBtn.addEventListener('click', () => {
       body.classList.toggle('light');
-      updateAllIcons();
+      setToggleIcon();
+      updateSocialIcons();
     });
 
-    // Hover effect for toggle button
-    toggleBtn.addEventListener('mouseenter', () => {
-      const isLight = body.classList.contains('light');
-      const hoverSrc = isLight ? 'resources/images/icons/moon-hover.png' : 'resources/images/icons/sun-hover.png';
-      toggleBtn.innerHTML = `<img src="${hoverSrc}" alt="${isLight ? 'Dark' : 'Light'} mode" width="28" height="28">`;
-    });
-
-    toggleBtn.addEventListener('mouseleave', () => {
-      updateAllIcons();
-    });
-
-    updateAllIcons();
+    setToggleIcon();
+    updateSocialIcons();
   </script>
 </body>
 </html>
