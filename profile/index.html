@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <link rel="icon" href="../resources/images/icons/favicon.png" type="image/png" media="(prefers-color-scheme: light)">
+  <link rel="icon" href="../resources/images/icons/favicon-white.png" type="image/png" media="(prefers-color-scheme: dark)">
+  <link rel="apple-touch-icon" href="../resources/images/icons/apple-touch-icon.png">
+  <link rel="apple-touch-icon" href="../resources/images/icons/apple-touch-icon-dark.png" media="(prefers-color-scheme: dark)">
+  <title>Brian Crink · Social</title>
+  <style>
+  :root { --gray: #6b6b6b; --white: #fff; --row: 48px; }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; background: #000; overflow: hidden;
+    overscroll-behavior: none; touch-action: none; }
+  body { display: flex; align-items: center; justify-content: center;
+    font: 400 clamp(14px, 3.6vw, 40px)/1.5 ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    color: var(--white); -webkit-user-select: none; user-select: none; }
+  @media (max-width: 768px) { body { font-size: clamp(15px, 4vw, 40px); } }
+  .line { display: flex; align-items: center; justify-content: center; width: max-content; opacity: 0;
+    transition: transform .8s cubic-bezier(.2,.8,.2,1), opacity 1.6s ease; }
+  .line.ready { opacity: 1; }
+  .fixed { color: var(--gray); white-space: nowrap; flex-shrink: 0; }
+  .reel { position: relative; height: calc(var(--row) * 9); flex-shrink: 0;
+    -webkit-mask-image: linear-gradient(transparent, #000 18%, #000 82%, transparent);
+            mask-image: linear-gradient(transparent, #000 18%, #000 82%, transparent); }
+  .item { position: absolute; left: 0; right: 0; top: 50%; height: var(--row);
+    margin-top: calc(var(--row) / -2); line-height: var(--row); white-space: nowrap;
+    color: var(--gray); transition: color .35s; will-change: transform, opacity;
+    text-align: left; }
+  @property --pc1 { syntax: '<color>'; inherits: false; initial-value: #ff006e; }
+  @property --pc2 { syntax: '<color>'; inherits: false; initial-value: #8338ec; }
+  @property --pc3 { syntax: '<color>'; inherits: false; initial-value: #3a86ff; }
+  @property --pc4 { syntax: '<color>'; inherits: false; initial-value: #06d6a0; }
+  @property --pc5 { syntax: '<color>'; inherits: false; initial-value: #ffbe0b; }
+  @keyframes portalChromaFade {
+    0%   { --pc1: #ff006e; --pc2: #8338ec; --pc3: #3a86ff; --pc4: #06d6a0; --pc5: #ffbe0b; }
+    20%  { --pc1: #ffbe0b; --pc2: #ff006e; --pc3: #8338ec; --pc4: #3a86ff; --pc5: #06d6a0; }
+    40%  { --pc1: #06d6a0; --pc2: #ffbe0b; --pc3: #ff006e; --pc4: #8338ec; --pc5: #3a86ff; }
+    60%  { --pc1: #3a86ff; --pc2: #06d6a0; --pc3: #ffbe0b; --pc4: #ff006e; --pc5: #8338ec; }
+    80%  { --pc1: #8338ec; --pc2: #3a86ff; --pc3: #06d6a0; --pc4: #ffbe0b; --pc5: #ff006e; }
+    100% { --pc1: #ff006e; --pc2: #8338ec; --pc3: #3a86ff; --pc4: #06d6a0; --pc5: #ffbe0b; }
+  }
+  .item.chroma {
+    background-image: linear-gradient(90deg, var(--pc1), var(--pc2), var(--pc3), var(--pc4), var(--pc5));
+    -webkit-background-clip: text; background-clip: text;
+    color: transparent; -webkit-text-fill-color: transparent;
+    animation: portalChromaFade 8s linear infinite;
+  }
+  @media (prefers-reduced-motion: reduce) { .item.chroma { animation: none; } }
+  .hint { position: fixed; bottom: max(24px, env(safe-area-inset-bottom)); left: 0; right: 0;
+    text-align: center; font-size: 13px; line-height: 1.8; color: var(--gray);
+    opacity: 0; transition: opacity .6s; pointer-events: none; }
+  .hint.show { opacity: 1; }
+  .hint div { transition: color .4s; min-height: 1.8em; }
+  .hint .rec { animation: hintFlash 2.6s ease-in-out infinite; }
+  @keyframes hintFlash { 0%, 100% { color: #fff; } 50% { color: var(--gray); } }
+  @media (prefers-reduced-motion: reduce) { .hint .rec { animation: none; color: #fff; } }
+  </style>
+</head>
+<body>
+  <div class="line" id="line">
+    <div class="fixed" id="fixed">social.briancrink.com/profile/</div>
+    <div class="reel" id="pgReel"></div>
+  </div>
+  <div class="hint" id="hint"><div id="hintA"></div><div id="hintB"></div></div>
+
+  <script>
+  // ── Configuration ──────────────────────────────────────────────────────────
+  const PLATFORMS = [
+    { name: "behance",   url: "https://behance.net/briancrinkf24d" },
+    { name: "discord",   url: "https://discord.com/users/1090746998677844008" },
+    { name: "github",    url: "https://github.com/briancrink" },
+    { name: "gitlab",    url: "https://gitlab.com/briancrink" },
+    { name: "instagram", url: "https://instagram.com/briancrink" },
+    { name: "linkedin",  url: "https://linkedin.com/in/briancrink" },
+    { name: "medium",    url: "https://medium.com/@briancrink" },
+    { name: "meetup",    url: "https://meetup.com/members/222435284" },
+    { name: "threads",   url: "https://threads.com/@briancrink" },
+    { name: "x",         url: "https://x.com/briancrink" },
+  ];
+  const START_NAME = "github";
+  const INTRO_MS = 3200;
+  const CHROMA_NAME = "x";
+  const DELAY = 1000;
+  const FADE_OUT_MS = 2200, FADE_IN_MS = 600, REDIRECT_PAUSE = 2000;
+
+  // ── State ──────────────────────────────────────────────────────────────────
+  const $ = id => document.getElementById(id);
+  const lineEl = $("line"), hintEl = $("hint"), hintA = $("hintA"), hintB = $("hintB");
+  const mod = (a, n) => ((a % n) + n) % n;
+  const ROWS = 9, MID = 4;
+  let rowPx = 48;
+  function measure() {
+    rowPx = parseFloat(getComputedStyle(document.body).fontSize) * 1.5;
+    document.documentElement.style.setProperty("--row", rowPx + "px");
+  }
+  measure(); addEventListener("resize", measure);
+
+  const mk = n => ({ n, pos: 0, vel: 0, target: null, drag: false, dim: 0, dimTarget: 0 });
+  const names = PLATFORMS.map(p => p.name);
+  const pg = mk(names.length);
+  const build = el => Array.from({ length: ROWS }, () => {
+    const d = document.createElement("div"); d.className = "item"; el.appendChild(d); return d; });
+  const pgRows = build($("pgReel"));
+
+  let acted = false, intro = null, ready = true, isSettled = false;
+  let lastInput = 0, settledAt = null, started = false, exiting = false, exitAt = 0;
+
+  const cur = () => PLATFORMS[mod(Math.round(pg.pos), pg.n)];
+  const touched = () => {
+    started = true; acted = true; intro = null;
+    if (exiting) { exiting = false; settledAt = null; }
+  };
+
+  // ── Drawing ────────────────────────────────────────────────────────────────
+  function draw(r, rows, list, white, chromaLabel) {
+    const base = Math.round(r.pos), frac = r.pos - base;
+    rows.forEach((el, j) => {
+      const k = j - MID, d = k - frac, label = list[mod(base + k, list.length)];
+      if (el._t !== label) { el.textContent = label; el._t = label; }
+      let o = Math.max(0, 1 - Math.abs(d) * 0.26);
+      if (k !== 0) o *= 1 - r.dim * r.dim * (3 - 2 * r.dim);
+      el.style.transform = `translateY(${d * rowPx}px)`;
+      el.style.opacity = o.toFixed(3);
+      const chroma = k === 0 && white && label === chromaLabel;
+      el.classList.toggle("chroma", chroma);
+      el.style.color = chroma ? "" : (k === 0 && white ? "#fff" : "");
+    });
+  }
+
+  const ctx = document.createElement("canvas").getContext("2d");
+  let centredKey = null;
+  let reelWidth = 0;
+  function setupReelWidth() {
+    const cs = getComputedStyle(document.body);
+    ctx.font = `${cs.fontSize} ${cs.fontFamily}`;
+    reelWidth = Math.max(...names.map(n => ctx.measureText(n).width)) + 8;
+    $("pgReel").style.width = reelWidth + "px";
+  }
+  setupReelWidth();
+  addEventListener("resize", () => { measure(); setupReelWidth(); recentre(true); });
+
+  function recentre(instant = false) {
+    // Center the fixed URL + the longest platform name as a single unit.
+    // Shorter names stay left-aligned inside the reserved reel width so the fixed text never moves or clips.
+    if (instant) lineEl.style.transition = "none";
+    lineEl.style.transform = "translateX(0)";
+    if (instant) { void lineEl.offsetWidth; lineEl.style.transition = ""; }
+  }
+
+  function startExit() {
+    if (exiting) return;
+    exiting = true; exitAt = performance.now() + FADE_OUT_MS + REDIRECT_PAUSE;
+    pg.vel = 0; pg.target = Math.round(pg.pos);
+    recentre();
+  }
+  function go() { location.href = cur().url; }
+  function selectCurrent() {
+    if (!ready || intro) return;
+    started = true; startExit();
+  }
+
+  // ── Bottom hint ────────────────────────────────────────────────────────────
+  const IS_TOUCH = matchMedia("(hover: none) and (pointer: coarse)").matches;
+  const HINTS = IS_TOUCH
+    ? { scroll: "Swipe ↑ or ↓", select: "Tap to open" }
+    : { scroll: "Scroll", select: "Click, Enter, or →" };
+  let hintKey = "";
+  function updateHint() {
+    hintEl.classList.toggle("show", ready && !intro && !exiting);
+    const key = acted ? "acted" : "idle";
+    if (key === hintKey) return;
+    hintKey = key;
+    hintA.textContent = HINTS.scroll; hintB.textContent = HINTS.select;
+    hintA.classList.toggle("rec", !acted); hintB.classList.toggle("rec", acted);
+  }
+
+  // ── Main loop ──────────────────────────────────────────────────────────────
+  let prevT = 0, shown = false;
+  function tick(now) {
+    const dt = prevT ? Math.min(now - prevT, 100) : 16; prevT = now;
+    const r = pg; let settled = false;
+    if (intro) {
+      if (intro.t0 === null) intro.t0 = now;
+      const t = Math.min(1, (now - intro.t0) / intro.ms);
+      const e = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+      intro.reel.pos = intro.start + (intro.end - intro.start) * e;
+      if (t >= 1) { intro.reel.pos = intro.end; intro = null; }
+    } else if (!r.drag && now - lastInput > 120) {
+      if (Math.abs(r.vel) > 0.02) { r.pos += r.vel; r.vel *= 0.95; r.target = null; }
+      else {
+        r.vel = 0;
+        const goal = r.target !== null ? r.target : Math.round(r.pos), d = goal - r.pos;
+        if (Math.abs(d) < 0.004) { r.pos = goal; r.target = null; settled = true; }
+        else r.pos += d * 0.16;
+      }
+    }
+    isSettled = exiting || settled;
+    if (!exiting && settled) {
+      const key = mod(Math.round(pg.pos), pg.n);
+      if (key !== centredKey) { centredKey = key; recentre(); }
+    }
+    pg.dimTarget = exiting ? 1 : 0;
+    const step = dt / (pg.dimTarget ? FADE_OUT_MS : FADE_IN_MS);
+    pg.dim = pg.dimTarget ? Math.min(1, pg.dim + step) : Math.max(0, pg.dim - step);
+
+    draw(pg, pgRows, names, isSettled, CHROMA_NAME);
+    updateHint();
+    if (!shown) { shown = true; lineEl.classList.add("ready"); recentre(true); }
+
+    if (exiting) { if (now >= exitAt) { go(); return; } }
+    else if (started && settled) {
+      if (settledAt === null) settledAt = now;
+      if (now - settledAt >= DELAY) { settledAt = null; startExit(); }
+    } else settledAt = null;
+
+    requestAnimationFrame(tick);
+  }
+
+  // Initial placement + optional intro spin
+  const end = Math.max(0, names.indexOf(START_NAME));
+  pg.pos = end;
+  recentre(true);
+  if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    const start = end - (pg.n + 8);
+    pg.pos = start; intro = { reel: pg, start, end, t0: null, ms: INTRO_MS };
+  }
+  requestAnimationFrame(tick);
+
+  addEventListener("pagehide", () => { document.documentElement.style.visibility = "hidden"; });
+  addEventListener("pageshow", e => { if (e.persisted) location.reload(); });
+
+  // ── Input ──────────────────────────────────────────────────────────────────
+  addEventListener("wheel", e => {
+    e.preventDefault(); if (!ready) return; touched();
+    const r = pg; let dy = e.deltaY; if (e.deltaMode === 1) dy *= 33;
+    r.pos += dy / (rowPx * 1.6); r.vel = 0; r.target = null; lastInput = performance.now();
+  }, { passive: false });
+
+  addEventListener("keydown", e => {
+    if (!ready) return;
+    const r = pg;
+    if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+      e.preventDefault(); touched();
+      r.target = (r.target !== null ? r.target : Math.round(r.pos)) + (e.key === "ArrowDown" ? 1 : -1);
+      r.vel = 0;
+    } else if (e.key === "ArrowRight" || e.key === "Enter") selectCurrent();
+  });
+
+  addEventListener("click", selectCurrent);
+
+  let sx = 0, sy = 0, lastY = 0, lastT = 0, axis = null, endX = 0, moved = false, tapT = 0;
+  addEventListener("touchstart", e => {
+    if (!ready) return;
+    const r = pg; r.drag = true; r.vel = 0; r.target = null; axis = null; moved = false; tapT = performance.now();
+    sx = endX = e.touches[0].clientX; sy = lastY = e.touches[0].clientY; lastT = performance.now();
+  }, { passive: true });
+  addEventListener("touchmove", e => {
+    e.preventDefault(); if (!ready) return;
+    const r = pg, t = e.touches[0]; endX = t.clientX;
+    if (!axis && Math.hypot(t.clientX - sx, t.clientY - sy) > 8)
+      axis = Math.abs(t.clientX - sx) > Math.abs(t.clientY - sy) ? "x" : "y";
+    if (axis && !moved) { moved = true; touched(); }
+    if (axis !== "y") return;
+    const dy = (lastY - t.clientY) / rowPx;
+    r.pos += dy; r.vel = Math.max(-1.5, Math.min(1.5, r.vel * 0.6 + dy * 0.4));
+    lastY = t.clientY; lastT = performance.now(); lastInput = lastT;
+  }, { passive: false });
+  addEventListener("touchend", e => {
+    if (!ready) return;
+    if (axis === null && performance.now() - tapT < 500) {
+      pg.drag = false; e.preventDefault(); selectCurrent(); return;
+    }
+    const r = pg; r.drag = false;
+    if (axis === "x" && Math.abs(sx - endX) > 50) selectCurrent();
+    else if (performance.now() - lastT > 80) r.vel = 0;
+    lastInput = 0;
+  });
+  </script>
+</body>
+</html>
