@@ -422,6 +422,8 @@
       cursor: pointer;
       font-family: inherit;
       white-space: nowrap;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
     }
 
     .toggle-option svg {
@@ -664,8 +666,11 @@
     const reduceMotion = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
     let jellyAnim = null;
 
-    function spring(t, k, w) {
-      return 1 - Math.exp(-k * t) * (Math.cos(w * t) + (k / w) * Math.sin(w * t));
+    // Damped spring with an initial velocity (v0) so motion begins on frame one
+    // instead of easing in from a standstill.
+    function spring(t, k, w, v0) {
+      v0 = v0 || 0;
+      return 1 - Math.exp(-k * t) * (Math.cos(w * t) + ((k - v0) / w) * Math.sin(w * t));
     }
 
     function jellySlide(fromL, fromR, toL, toR) {
@@ -676,8 +681,8 @@
       const N = 180;
       for (let i = 0; i <= N; i++) {
         const t = i / N;
-        const lead = spring(t, 9, 11.5);
-        const trail = spring(t, 7, 7.2);
+        const lead = spring(t, 9, 11.5, 5);
+        const trail = spring(t, 7, 7.2, 2);
         let L, R;
         if (movingRight) {
           R = fromR + (toR - fromR) * lead;
@@ -752,11 +757,24 @@
     }
 
     let viewReady = false;
+    let currentView = 'follow';
+    let contentToken = 0;
+
+    function applyContentView(next, changed) {
+      body.dataset.view = next;
+      const hash = '#' + next;
+      if (location.hash !== hash) {
+        try { history.replaceState(null, '', hash); } catch (err) {}
+      }
+      if (!viewReady || changed) replayViewFade();
+    }
 
     function setView(view) {
       const next = VIEWS.includes(view) ? view : 'follow';
-      const changed = (body.dataset.view || 'follow') !== next;
-      body.dataset.view = next;
+      const changed = currentView !== next;
+      currentView = next;
+
+      // 1) Tabs + knob first, synchronously: nothing heavy runs before the knob starts.
       modeToggle.classList.toggle('follow', next === 'follow');
       modeToggle.classList.toggle('join', next === 'join');
       modeToggle.classList.toggle('connect', next === 'connect');
@@ -768,14 +786,24 @@
         tab.classList.toggle('inactive', !on);
         tab.setAttribute('aria-selected', on ? 'true' : 'false');
       });
-      const hash = '#' + next;
-      if (location.hash !== hash) {
-        try { history.replaceState(null, '', hash); } catch (err) {}
+
+      if (!viewReady) {
+        // Initial load: no animation, apply everything now.
+        applyContentView(next, changed);
+        requestAnimationFrame(() => syncSlider(false));
+        viewReady = true;
+        return;
       }
-      const jelly = viewReady && changed;
-      requestAnimationFrame(() => syncSlider(jelly));
-      if (!viewReady || changed) replayViewFade();
-      viewReady = true;
+
+      syncSlider(changed);
+
+      // 2) Content swap (display toggle + forced reflow + fade replay) waits until the
+      //    knob's first frame has painted. Only the latest request is applied.
+      const token = ++contentToken;
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        if (token !== contentToken) return;
+        applyContentView(next, changed);
+      }));
     }
 
     const startupHeader = document.getElementById('startupHeader');
@@ -869,7 +897,7 @@
 
     document.addEventListener('keydown', (e) => {
       if (e.target.closest('input, textarea, [contenteditable="true"]')) return;
-      const i = VIEWS.indexOf(body.dataset.view || 'follow');
+      const i = VIEWS.indexOf(currentView);
       if (e.key === 'ArrowRight') {
         e.preventDefault();
         setView(VIEWS[(i + 1) % VIEWS.length]);
