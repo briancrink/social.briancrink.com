@@ -13,26 +13,47 @@
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
+    :root {
+      --page-bg: #000000;
+      --page-fg: #ffffff;
+      --hero-compact: 0;
+      --compact-range: 160px;
+      --image-x: -9px;
+      --image-y: 13px;
+      --image-slot: 148px;
+      --tool-collapse: 138px;
+      --chrome-expanded: 420px;
+    }
+
     html, body {
       height: 100%;
       height: 100dvh;
+      max-height: 100%;
       overflow: hidden;
+      background-color: var(--page-bg);
+      color: var(--page-fg);
+      transition: background-color 0.45s ease, color 0.45s ease;
     }
 
     body {
       font-family: 'Inter', system-ui, sans-serif;
       margin: 0;
-      padding: 70px 20px;
+      padding: 0;
       min-height: 100vh;
-      background: #000000;
-      color: #ffffff;
+      background-color: var(--page-bg);
+      color: var(--page-fg);
       display: flex;
       align-items: flex-start;
       justify-content: center;
       line-height: 1.6;
-      transition: background 0.4s, color 0.4s;
       opacity: 0;
       animation: fadeIn 1.3s forwards;
+    }
+
+    body.light,
+    html:has(body.light) {
+      --page-bg: #ffffff;
+      --page-fg: #1a1a1a;
     }
 
     @keyframes fadeIn {
@@ -40,12 +61,11 @@
       to   { opacity: 1; }
     }
 
-    .container {
-      position: relative;
-      max-width: 620px;
-      width: 100%;
-      text-align: center;
-      margin-top: 24px;
+    .social-row.view-entering > .social-group > h2,
+    .social-row.view-entering .social-item {
+      opacity: 0;
+      animation: fadeIn 1.1s forwards;
+      animation-delay: calc(var(--col, 0) * 0.14s);
     }
 
     @property --pc1 { syntax: '<color>'; inherits: false; initial-value: #ff006e; }
@@ -115,16 +135,12 @@
       letter-spacing: 0.08rem;
     }
 
-    .site-nav .nav-dot {
-      color: #ffffff;
-      font-weight: 400;
-      font-size: 1.0rem;
-      line-height: 1;
-      letter-spacing: 0;
-    }
-
-    body.light .site-nav .nav-dot {
-      color: #000000;
+    .site-nav-link.life {
+      color: #7dd3fc;
+      -webkit-text-fill-color: #7dd3fc;
+      font-size: 1.1rem;
+      font-weight: 600;
+      letter-spacing: 0.04rem;
     }
 
     .site-nav-link {
@@ -161,7 +177,7 @@
       font-size: 3.0rem;
       font-weight: 600;
       color: #ffffff;
-      margin: 0 0 15px 0;
+      margin: 0;
       letter-spacing: -0.5px;
     }
 
@@ -181,14 +197,22 @@
     }
 
     h2 {
-      font-size: 1.8rem;
-      margin: 40px 0 20px;
+      font-size: 1.5rem;
+      margin: 50px auto 20px;
       font-weight: 600;
+      white-space: nowrap;
+      color: #ffffff;
+      text-align: center;
+    }
+
+    body.light h2 {
+      color: #1a1a1a;
     }
 
     .icons {
       display: flex;
       justify-content: center;
+      align-items: stretch;
       gap: 24px;
       margin-bottom: 20px;
       flex-wrap: wrap;
@@ -204,14 +228,11 @@
       transform: scale(1.15);
     }
 
-    body.light { background: #ffffff; color: #1a1a1a; }
-    body.light h2 { color: #1a1a1a; }
-
     .toggle-btn {
       position: fixed;
       top: 20px;
       right: 20px;
-      z-index: 10;
+      z-index: 40;
       background: transparent;
       border: none;
       width: 48px;
@@ -245,78 +266,352 @@
         right: 12px;
       }
     }
+
+    .header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 30;
+      width: 100%;
+      padding: 12px 20px 0;
+      background-color: transparent;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    #scroller {
+      position: fixed;
+      left: 0;
+      right: 0;
+      top: var(--chrome-expanded);
+      bottom: 0;
+      z-index: 1;
+      overflow-x: hidden;
+      overflow-y: auto;
+      overscroll-behavior-y: none;
+      -webkit-overflow-scrolling: touch;
+      padding: 0 20px 48px;
+      text-align: center;
+    }
+
+    .hero {
+      position: relative;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 0;
+    }
+
+    .profile-image {
+      position: absolute;
+      left: 50%;
+      top: var(--image-y);
+      width: 160px;
+      max-width: 160px;
+      height: auto;
+      margin: 0;
+      transform: translateX(calc(-50% + var(--image-x)));
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .view-toggle-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      margin-top: 0;
+      position: relative;
+      z-index: 4;
+      width: 100%;
+      padding-top: calc(var(--image-slot) - (var(--hero-compact) * var(--tool-collapse)));
+    }
+
+    .mode-toggle {
+      position: relative;
+      display: inline-flex;
+      width: max-content;
+      max-width: calc(100% - 24px);
+      background: rgba(255, 255, 255, 0.146);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 50px;
+      padding: 4px;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+      isolation: isolate;
+      z-index: 4;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .mode-toggle:hover {
+      background: rgba(255, 255, 255, 0.14);
+      border-color: rgba(255, 255, 255, 0.25);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    }
+
+    body.light .mode-toggle {
+      background: rgba(0, 0, 0, 0.08);
+      border-color: rgba(0, 0, 0, 0.15);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    .toggle-slider {
+      position: absolute;
+      top: 4px;
+      bottom: 4px;
+      left: var(--slider-l, 4px);
+      width: var(--slider-w, 33%);
+      background: rgba(255, 255, 255, 0.18);
+      border-radius: 46px;
+      transition: background 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      transform-origin: center;
+      will-change: left, width, transform;
+      z-index: 1;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .toggle-slider {
+        transition: left 0.2s ease, width 0.2s ease, background 0.3s ease;
+      }
+    }
+
+    .mode-toggle.follow .toggle-slider {
+      background: rgba(125, 211, 252, 0.55);
+    }
+
+    .mode-toggle.join .toggle-slider {
+      background: rgba(63, 143, 78, 0.65);
+    }
+
+    .mode-toggle.connect .toggle-slider {
+      background: rgba(255, 176, 74, 0.7);
+    }
+
+    body.light .mode-toggle.follow .toggle-slider {
+      background: rgba(14, 165, 233, 0.55);
+    }
+
+    body.light .mode-toggle.join .toggle-slider {
+      background: rgba(63, 143, 78, 0.6);
+    }
+
+    body.light .mode-toggle.connect .toggle-slider {
+      background: rgba(255, 176, 74, 0.65);
+    }
+
+    .toggle-option {
+      position: relative;
+      flex: 0 0 auto;
+      padding: 8px 16px;
+      min-width: 50px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      font-weight: 500;
+      border-radius: 46px;
+      z-index: 2;
+      transition: color 0.2s ease;
+      background: transparent;
+      border: 0;
+      color: rgba(255, 255, 255, 0.55);
+      cursor: pointer;
+      font-family: inherit;
+      white-space: nowrap;
+    }
+
+    .toggle-option svg {
+      width: 22px;
+      height: 22px;
+      display: block;
+      fill: currentColor;
+      stroke: none;
+    }
+
+    /* Dark mode: white icons. Light mode: black icons. */
+    .toggle-option.active { color: #ffffff; }
+    .toggle-option.inactive { color: rgba(255, 255, 255, 0.7); }
+    body.light .toggle-option.active { color: #000000; }
+    body.light .toggle-option.inactive { color: rgba(0, 0, 0, 0.62); }
+
+    .toggle-label {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+    }
+
+    .divider {
+      width: 70%;
+      height: 1px;
+      background-color: rgba(255, 255, 255, 0.2);
+      margin: 32px auto -14px;
+      border: 0;
+    }
+
+    body.light .divider {
+      background-color: rgba(0, 0, 0, 0.15);
+    }
+
+    .social-group {
+      display: none;
+      width: 100%;
+      text-align: center;
+    }
+
+    body[data-view="follow"] .group-follow,
+    body[data-view="join"] .group-join,
+    body[data-view="connect"] .group-connect {
+      display: block;
+    }
+
+    .social-row {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+    }
+
+    @media (max-width: 949px) {
+      .icon img {
+        width: 40px;
+        height: 40px;
+      }
+    }
   </style>
 </head>
-<body>
-  <div class="container">
-    <button class="toggle-btn" id="theme-toggle" type="button" aria-label="Dark mode">
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.15"/><line x1="12" y1="2.4" x2="12" y2="5.1"/><line x1="12" y1="18.9" x2="12" y2="21.6"/><line x1="2.4" y1="12" x2="5.1" y2="12"/><line x1="18.9" y1="12" x2="21.6" y2="12"/><line x1="5.2" y1="5.2" x2="7.1" y2="7.1"/><line x1="16.9" y1="16.9" x2="18.8" y2="18.8"/><line x1="18.8" y1="5.2" x2="16.9" y2="7.1"/><line x1="7.1" y1="16.9" x2="5.2" y2="18.8"/></svg>
-    </button>
+<body data-view="follow">
+  <button class="toggle-btn" id="theme-toggle" type="button" aria-label="Dark mode">
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.15"/><line x1="12" y1="2.4" x2="12" y2="5.1"/><line x1="12" y1="18.9" x2="12" y2="21.6"/><line x1="2.4" y1="12" x2="5.1" y2="12"/><line x1="18.9" y1="12" x2="21.6" y2="12"/><line x1="5.2" y1="5.2" x2="7.1" y2="7.1"/><line x1="16.9" y1="16.9" x2="18.8" y2="18.8"/><line x1="18.8" y1="5.2" x2="16.9" y2="7.1"/><line x1="7.1" y1="16.9" x2="5.2" y2="18.8"/></svg>
+  </button>
 
+  <div class="header" id="startupHeader">
     <div class="site-nav">
       <p class="site-link">
         <a href="https://portal.briancrink.com" class="site-nav-link portal">Portal</a>
-        <span class="nav-dot" aria-hidden="true">•</span>
         <a href="https://site.briancrink.com/map" class="map-link" aria-label="Site map"><svg class="map-icon" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <clipPath id="mapFillPortal"><path d="M3.15 7.85 L8.85 4.55 L15.05 8.05 L20.7 4.75 L20.7 16.25 L15.05 19.55 L8.85 16.05 L3.15 19.35 Z"/></clipPath>
-              <g clip-path="url(#mapFillPortal)">
-                <path d="M3.15 7.85 L8.85 4.55 L15.05 8.05 L20.7 4.75 L20.7 16.25 L15.05 19.55 L8.85 16.05 L3.15 19.35 Z" fill="#3f8f4e"/>
-                <path d="M3.15 19.35 C 8.85 11.05, 15.05 13.8, 20.7 8.75 V 14.65 C 18.9 15.9, 16.15 18.4, 14.85 19.35 L 3.15 19.35 Z" fill="#3a86ff"/>
-              </g>
-              <path d="M3.15 7.85 L8.85 4.55 L15.05 8.05 L20.7 4.75 L20.7 16.25 L15.05 19.55 L8.85 16.05 L3.15 19.35 Z" fill="none" stroke="rgba(47, 58, 51, 0.32)" stroke-width="0.85"/>
-              <line x1="8.85" y1="6.2" x2="8.85" y2="14.4" stroke="rgba(255,255,255,0.62)" stroke-width="0.36" stroke-linecap="round" stroke-dasharray="0.42 2.25"/>
-              <line x1="15.05" y1="9.7" x2="15.05" y2="17.9" stroke="rgba(255,255,255,0.62)" stroke-width="0.36" stroke-linecap="round" stroke-dasharray="0.42 2.25"/>
-              <g class="map-compass">
-                <circle cx="6.114" cy="14.75" r="2.38" fill="#ffffff" stroke="#2eb5e8" stroke-width="0.58"/>
-                <circle cx="6.114" cy="14.75" r="2.07" fill="none" stroke="#1b94d0" stroke-width="0.16"/>
-                <line x1="6.114" y1="13.02" x2="6.114" y2="12.68" stroke="#9ecce4" stroke-width="0.22" stroke-linecap="round"/>
-                <line x1="6.114" y1="16.48" x2="6.114" y2="16.82" stroke="#9ecce4" stroke-width="0.22" stroke-linecap="round"/>
-                <line x1="4.384" y1="14.75" x2="4.044" y2="14.75" stroke="#9ecce4" stroke-width="0.22" stroke-linecap="round"/>
-                <line x1="7.844" y1="14.75" x2="8.184" y2="14.75" stroke="#9ecce4" stroke-width="0.22" stroke-linecap="round"/>
-                <path d="M7.259 13.605 L5.605 14.241 L6.623 15.259 Z" fill="#ef4a3c"/>
-                <path d="M4.969 15.895 L5.605 14.241 L6.623 15.259 Z" fill="#33b7e8"/>
-                <circle cx="6.114" cy="14.75" r="0.46" fill="#ffffff"/>
-              </g>
-              <line x1="19.545" y1="13.689" x2="22.395" y2="16.539" stroke="#e0b36a" stroke-width="1.85" stroke-linecap="round"/>
-              <circle cx="16.858" cy="11.002" r="2.85" fill="rgba(90, 190, 255, 0.38)" stroke="#8b9098" stroke-width="0.82"/>
-            </svg></a>
+          <clipPath id="mapFillPortal"><path d="M3.15 7.85 L8.85 4.55 L15.05 8.05 L20.7 4.75 L20.7 16.25 L15.05 19.55 L8.85 16.05 L3.15 19.35 Z"/></clipPath>
+          <g clip-path="url(#mapFillPortal)">
+            <path d="M3.15 7.85 L8.85 4.55 L15.05 8.05 L20.7 4.75 L20.7 16.25 L15.05 19.55 L8.85 16.05 L3.15 19.35 Z" fill="#3f8f4e"/>
+            <path d="M3.15 19.35 C 8.85 11.05, 15.05 13.8, 20.7 8.75 V 14.65 C 18.9 15.9, 16.15 18.4, 14.85 19.35 L 3.15 19.35 Z" fill="#3a86ff"/>
+          </g>
+          <path d="M3.15 7.85 L8.85 4.55 L15.05 8.05 L20.7 4.75 L20.7 16.25 L15.05 19.55 L8.85 16.05 L3.15 19.35 Z" fill="none" stroke="rgba(47, 58, 51, 0.32)" stroke-width="0.85"/>
+          <line x1="8.85" y1="6.2" x2="8.85" y2="14.4" stroke="rgba(255,255,255,0.62)" stroke-width="0.36" stroke-linecap="round" stroke-dasharray="0.42 2.25"/>
+          <line x1="15.05" y1="9.7" x2="15.05" y2="17.9" stroke="rgba(255,255,255,0.62)" stroke-width="0.36" stroke-linecap="round" stroke-dasharray="0.42 2.25"/>
+          <g class="map-compass">
+            <circle cx="6.114" cy="14.75" r="2.38" fill="#ffffff" stroke="#2eb5e8" stroke-width="0.58"/>
+            <circle cx="6.114" cy="14.75" r="2.07" fill="none" stroke="#1b94d0" stroke-width="0.16"/>
+            <line x1="6.114" y1="13.02" x2="6.114" y2="12.68" stroke="#9ecce4" stroke-width="0.22" stroke-linecap="round"/>
+            <line x1="6.114" y1="16.48" x2="6.114" y2="16.82" stroke="#9ecce4" stroke-width="0.22" stroke-linecap="round"/>
+            <line x1="4.384" y1="14.75" x2="4.044" y2="14.75" stroke="#9ecce4" stroke-width="0.22" stroke-linecap="round"/>
+            <line x1="7.844" y1="14.75" x2="8.184" y2="14.75" stroke="#9ecce4" stroke-width="0.22" stroke-linecap="round"/>
+            <path d="M7.259 13.605 L5.605 14.241 L6.623 15.259 Z" fill="#ef4a3c"/>
+            <path d="M4.969 15.895 L5.605 14.241 L6.623 15.259 Z" fill="#33b7e8"/>
+            <circle cx="6.114" cy="14.75" r="0.46" fill="#ffffff"/>
+          </g>
+          <line x1="19.545" y1="13.689" x2="22.395" y2="16.539" stroke="#e0b36a" stroke-width="1.85" stroke-linecap="round"/>
+          <circle cx="16.858" cy="11.002" r="2.85" fill="rgba(90, 190, 255, 0.38)" stroke="#8b9098" stroke-width="0.82"/>
+        </svg></a>
+        <a href="https://portal.briancrink.com/#life" class="site-nav-link life">LifeOS</a>
       </p>
     </div>
 
     <h1 class="name"><a href="https://briancrink.com" class="name-link">Brian Crink</a></h1>
 
-    <h2>Follow</h2>
-    <div class="icons">
-      <a href="https://x.com/briancrink" class="icon"
-         data-light="resources/images/icons/dark/x.png"
-         data-dark="resources/images/icons/light/x.png">
-        <img src="resources/images/icons/color/x.png" alt="X" width="45" height="45">
-      </a>
-      <a href="https://threads.net/@briancrink" class="icon"
-         data-light="resources/images/icons/dark/threads.png"
-         data-dark="resources/images/icons/light/threads.png">
-        <img src="resources/images/icons/color/threads.png" alt="Threads" width="45" height="45">
-      </a>
-      <a href="https://instagram.com/briancrink" class="icon"
-         data-light="resources/images/icons/dark/instagram.png"
-         data-dark="resources/images/icons/light/instagram.png">
-        <img src="resources/images/icons/light/instagram.png" alt="Instagram" width="40" height="40">
-      </a>
+    <div class="hero">
+      <img src="resources/images/profile/profile_face.png" alt="Brian Crink" class="profile-image" draggable="false" data-fallback-src="https://raw.githubusercontent.com/briancrink/resources.briancrink.com/main/images/profile/profile_emoji_face.png" onerror="if(!this.dataset.fell && this.dataset.fallbackSrc){this.dataset.fell='1';this.src=this.dataset.fallbackSrc;}">
+      <div class="view-toggle-wrap">
+        <div class="mode-toggle follow" id="modeToggle" role="tablist" aria-label="Social view">
+          <div class="toggle-slider" id="toggleSlider"></div>
+          <button type="button" class="toggle-option active" id="tab-follow" role="tab" data-view="follow" aria-selected="true" aria-label="Follow">
+            <svg viewBox="0 0 32 32" aria-hidden="true" focusable="false">
+              <!-- Man: head and shoulders (solid) -->
+              <circle cx="13" cy="10" r="5.2"/>
+              <path d="M2.5 28.5 C2.5 21.6 7 17.6 13 17.6 C19 17.6 23.5 21.6 23.5 28.5 Z"/>
+              <!-- Plus (separate, no contact) -->
+              <rect x="25.65" y="4" width="1.7" height="10" rx="0.85"/>
+              <rect x="21.5" y="8.15" width="10" height="1.7" rx="0.85"/>
+            </svg>
+            <span class="toggle-label">Follow</span>
+          </button>
+          <button type="button" class="toggle-option inactive" id="tab-join" role="tab" data-view="join" aria-selected="false" aria-label="Join">
+            <svg viewBox="0 0 32 32" aria-hidden="true" focusable="false">
+              <!-- Left person -->
+              <circle cx="5.25" cy="9.6" r="2.8"/>
+              <path d="M1 20.5 C1 16.3 3 14.3 5.25 14.3 C7.5 14.3 9.5 16.3 9.5 20.5 Z"/>
+              <!-- Center person -->
+              <circle cx="16" cy="8" r="3.4"/>
+              <path d="M11.5 20.5 C11.5 15.6 13.3 13.2 16 13.2 C18.7 13.2 20.5 15.6 20.5 20.5 Z"/>
+              <!-- Right person -->
+              <circle cx="26.75" cy="9.6" r="2.8"/>
+              <path d="M22.5 20.5 C22.5 16.3 24.5 14.3 26.75 14.3 C29 14.3 31 16.3 31 20.5 Z"/>
+              <!-- Plus (separate, no contact) -->
+              <rect x="26.15" y="23.3" width="1.7" height="8.4" rx="0.85"/>
+              <rect x="22.8" y="26.65" width="8.4" height="1.7" rx="0.85"/>
+            </svg>
+            <span class="toggle-label">Join</span>
+          </button>
+          <button type="button" class="toggle-option inactive" id="tab-connect" role="tab" data-view="connect" aria-selected="false" aria-label="Connect">
+            <svg viewBox="0 0 32 32" aria-hidden="true" focusable="false">
+              <!-- Solid oval message bubble -->
+              <g>
+                <ellipse cx="16" cy="14" rx="14" ry="10"/>
+                <path d="M7.5 19 L5.2 28 L16.5 23.5 Z"/>
+              </g>
+            </svg>
+            <span class="toggle-label">Connect</span>
+          </button>
+        </div>
+      </div>
     </div>
+    <hr class="divider">
+  </div>
 
-    <h2>Connect</h2>
-    <div class="icons">
-      <!-- Add more icons with data-light and data-dark -->
-    </div>
+  <div id="scroller">
+    <div class="social-row">
+      <section class="social-group group-follow">
+        <h2>Follow</h2>
+        <div class="icons">
+          <a href="https://x.com/briancrink" class="icon social-item"
+             data-light="resources/images/icons/dark/x.png"
+             data-dark="resources/images/icons/light/x.png">
+            <img src="resources/images/icons/color/x.png" alt="X" width="45" height="45">
+          </a>
+          <a href="https://threads.net/@briancrink" class="icon social-item"
+             data-light="resources/images/icons/dark/threads.png"
+             data-dark="resources/images/icons/light/threads.png">
+            <img src="resources/images/icons/color/threads.png" alt="Threads" width="45" height="45">
+          </a>
+          <a href="https://instagram.com/briancrink" class="icon social-item"
+             data-light="resources/images/icons/dark/instagram.png"
+             data-dark="resources/images/icons/light/instagram.png">
+            <img src="resources/images/icons/light/instagram.png" alt="Instagram" width="40" height="40">
+          </a>
+        </div>
+      </section>
 
-    <h2>Join</h2>
-    <div class="icons">
-      <a href="https://access.edu" class="icon"
-         data-light="resources/images/icons/dark/accessedu.png"
-         data-dark="resources/images/icons/light/accessedu.png">
-        <img src="resources/images/icons/dark/accessedu.png" alt="AccessEdu" width="45" height="45">
-      </a>
-      <!-- Add more... -->
+      <section class="social-group group-join">
+        <h2>Join</h2>
+        <div class="icons">
+          <a href="https://access.edu" class="icon social-item"
+             data-light="resources/images/icons/dark/accessedu.png"
+             data-dark="resources/images/icons/light/accessedu.png">
+            <img src="resources/images/icons/dark/accessedu.png" alt="AccessEdu" width="45" height="45">
+          </a>
+        </div>
+      </section>
+
+      <section class="social-group group-connect">
+        <h2>Connect</h2>
+        <div class="icons">
+          <!-- Add more icons with data-light and data-dark -->
+        </div>
+      </section>
     </div>
   </div>
 
@@ -351,6 +646,243 @@
 
     setToggleIcon();
     updateSocialIcons();
+
+    const modeToggle = document.getElementById('modeToggle');
+    const VIEWS = ['follow', 'join', 'connect'];
+    const viewTabs = {
+      follow: document.getElementById('tab-follow'),
+      join: document.getElementById('tab-join'),
+      connect: document.getElementById('tab-connect')
+    };
+
+    const sliderEl = document.getElementById('toggleSlider');
+    const reduceMotion = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
+    let jellyAnim = null;
+
+    function spring(t, k, w) {
+      return 1 - Math.exp(-k * t) * (Math.cos(w * t) + (k / w) * Math.sin(w * t));
+    }
+
+    function jellySlide(fromL, fromR, toL, toR) {
+      if (!sliderEl || !sliderEl.animate) return;
+      const movingRight = toL >= fromL;
+      const innerW = modeToggle.clientWidth;
+      const frames = [];
+      const N = 180;
+      for (let i = 0; i <= N; i++) {
+        const t = i / N;
+        const lead = spring(t, 9, 11.5);
+        const trail = spring(t, 7, 7.2);
+        let L, R;
+        if (movingRight) {
+          R = fromR + (toR - fromR) * lead;
+          L = fromL + (toL - fromL) * trail;
+        } else {
+          L = fromL + (toL - fromL) * lead;
+          R = fromR + (toR - fromR) * trail;
+        }
+        L = Math.max(0, L);
+        R = Math.min(innerW, R);
+        const squash = 0.15 * Math.sin(Math.PI * t) + 0.05 * Math.exp(-5 * t) * Math.sin(20 * t) * (1 - t);
+        frames.push({
+          left: L + 'px',
+          width: Math.max(0, R - L) + 'px',
+          transform: 'scaleY(' + (1 - squash).toFixed(4) + ')'
+        });
+      }
+      frames[N] = { left: toL + 'px', width: (toR - toL) + 'px', transform: 'scaleY(1)' };
+      jellyAnim = sliderEl.animate(frames, { duration: 650, easing: 'linear' });
+      const mine = jellyAnim;
+      mine.onfinish = mine.oncancel = () => { if (jellyAnim === mine) jellyAnim = null; };
+    }
+
+    function syncSlider(animate) {
+      if (!modeToggle || !sliderEl) return;
+      const active = modeToggle.querySelector('.toggle-option.active') || viewTabs.follow;
+      const toL = active.offsetLeft;
+      const toW = active.offsetWidth;
+
+      let fromL = null, fromR = null;
+      if (animate === true && !(reduceMotion && reduceMotion.matches)) {
+        const sr = sliderEl.getBoundingClientRect();
+        const tr = modeToggle.getBoundingClientRect();
+        fromL = sr.left - tr.left - modeToggle.clientLeft;
+        fromR = fromL + sr.width;
+      }
+
+      if (jellyAnim) { jellyAnim.cancel(); jellyAnim = null; }
+      modeToggle.style.setProperty('--slider-l', toL + 'px');
+      modeToggle.style.setProperty('--slider-w', toW + 'px');
+
+      if (fromL !== null && (Math.abs(fromL - toL) > 0.5 || Math.abs(fromR - (toL + toW)) > 0.5)) {
+        jellySlide(fromL, fromR, toL, toL + toW);
+      }
+    }
+
+    const socialRow = document.querySelector('.social-row');
+
+    function stampColumnDelays() {
+      if (!socialRow) return;
+      const items = Array.from(socialRow.querySelectorAll('.social-item:not([style*="display: none"])'));
+      // Only visible ones in current view
+      const visibleItems = items.filter(el => {
+        const group = el.closest('.social-group');
+        return group && getComputedStyle(group).display !== 'none';
+      });
+      const ixs = visibleItems.map((el) => Math.round(el.getBoundingClientRect().left));
+      const iunique = Array.from(new Set(ixs)).sort((a, b) => a - b);
+      visibleItems.forEach((el, i) => {
+        const col = iunique.length > 1 ? Math.max(0, iunique.indexOf(ixs[i])) : i;
+        el.style.setProperty('--col', String(col));
+      });
+      // Also for h2 if needed, but mainly items
+    }
+
+    function replayViewFade() {
+      if (!socialRow) return;
+      socialRow.classList.remove('view-entering');
+      void socialRow.offsetWidth;
+      socialRow.classList.add('view-entering');
+      requestAnimationFrame(stampColumnDelays);
+    }
+
+    let viewReady = false;
+
+    function setView(view) {
+      const next = VIEWS.includes(view) ? view : 'follow';
+      const changed = (body.dataset.view || 'follow') !== next;
+      body.dataset.view = next;
+      modeToggle.classList.toggle('follow', next === 'follow');
+      modeToggle.classList.toggle('join', next === 'join');
+      modeToggle.classList.toggle('connect', next === 'connect');
+      VIEWS.forEach((name) => {
+        const tab = viewTabs[name];
+        if (!tab) return;
+        const on = name === next;
+        tab.classList.toggle('active', on);
+        tab.classList.toggle('inactive', !on);
+        tab.setAttribute('aria-selected', on ? 'true' : 'false');
+      });
+      const hash = '#' + next;
+      if (location.hash !== hash) {
+        try { history.replaceState(null, '', hash); } catch (err) {}
+      }
+      const jelly = viewReady && changed;
+      requestAnimationFrame(() => syncSlider(jelly));
+      if (!viewReady || changed) replayViewFade();
+      viewReady = true;
+    }
+
+    const startupHeader = document.getElementById('startupHeader');
+    const scroller = document.getElementById('scroller');
+    let lastCompact = -1;
+
+    function compactRangePx() {
+      const raw = getComputedStyle(document.documentElement).getPropertyValue('--compact-range').trim();
+      const n = parseFloat(raw);
+      return Number.isFinite(n) ? n : 160;
+    }
+
+    function syncProfileClip() {
+      const img = document.querySelector('.profile-image');
+      const toggle = document.getElementById('modeToggle');
+      if (!img || !toggle) return;
+      const ir = img.getBoundingClientRect();
+      const cut = toggle.getBoundingClientRect().bottom;
+      const fade = 28;
+      if (cut >= ir.bottom - 0.5) {
+        img.style.opacity = '1';
+        img.style.webkitMaskImage = 'none';
+        img.style.maskImage = 'none';
+        return;
+      }
+      if (cut <= ir.top + 0.5) {
+        img.style.opacity = '0';
+        img.style.webkitMaskImage = 'none';
+        img.style.maskImage = 'none';
+        return;
+      }
+      img.style.opacity = '1';
+      const solid = Math.max(0, cut - ir.top - fade);
+      const end = Math.max(0, cut - ir.top);
+      const mask = 'linear-gradient(to bottom, #000 0, #000 ' + solid + 'px, transparent ' + end + 'px, transparent 100%)';
+      img.style.webkitMaskImage = mask;
+      img.style.maskImage = mask;
+    }
+
+    function measureChrome() {
+      if (!startupHeader) return;
+      const divider = startupHeader.querySelector('.divider');
+      const edge = divider || startupHeader;
+      const h = Math.ceil(edge.getBoundingClientRect().bottom);
+      document.documentElement.style.setProperty('--chrome-expanded', Math.max(0, h) + 'px');
+    }
+
+    function scrollYNow() {
+      return scroller ? scroller.scrollTop : window.scrollY;
+    }
+
+    function syncHeroCompact() {
+      const range = Math.max(1, compactRangePx());
+      const y = scrollYNow();
+      const tval = Math.min(1, Math.max(0, y / range));
+      const rounded = tval.toFixed(4);
+      if (rounded !== lastCompact) {
+        lastCompact = rounded;
+        document.documentElement.style.setProperty('--hero-compact', rounded);
+        syncProfileClip();
+        measureChrome();
+      }
+    }
+
+    if (scroller) {
+      scroller.addEventListener('scroll', () => {
+        requestAnimationFrame(syncHeroCompact);
+      }, { passive: true });
+    }
+    if (startupHeader && scroller) {
+      startupHeader.addEventListener('wheel', (e) => {
+        scroller.scrollTop += e.deltaY;
+      }, { passive: true });
+    }
+    window.addEventListener('resize', () => {
+      measureChrome();
+      syncProfileClip();
+      if (typeof syncSlider === 'function') syncSlider();
+    });
+    measureChrome();
+    syncHeroCompact();
+    if (window.ResizeObserver && startupHeader) {
+      new ResizeObserver(() => measureChrome()).observe(startupHeader);
+    }
+
+    requestAnimationFrame(syncSlider);
+
+    document.querySelectorAll('.mode-toggle .toggle-option').forEach((btn) => {
+      btn.addEventListener('click', () => setView(btn.dataset.view));
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.target.closest('input, textarea, [contenteditable="true"]')) return;
+      const i = VIEWS.indexOf(body.dataset.view || 'follow');
+      if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        setView(VIEWS[(i + 1) % VIEWS.length]);
+      } else if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        setView(VIEWS[(i - 1 + VIEWS.length) % VIEWS.length]);
+      }
+    });
+
+    function viewFromHash() {
+      const name = (location.hash || '#follow').slice(1);
+      return VIEWS.includes(name) ? name : 'follow';
+    }
+
+    window.addEventListener('hashchange', () => setView(viewFromHash()));
+    window.addEventListener('resize', syncSlider);
+    setView(viewFromHash());
+    requestAnimationFrame(syncSlider);
   </script>
 </body>
 </html>
