@@ -432,11 +432,6 @@
       stroke: none;
     }
 
-    /* Desktop only: thinner plus strokes (mobile keeps 1.7) */
-    @media (min-width: 769px) {
-      .toggle-option svg .plus-stroke { stroke-width: 1.02; }
-    }
-
     /* Dark mode: white icons. Light mode: black icons. */
     .toggle-option.active { color: #ffffff; }
     .toggle-option.inactive { color: rgba(255, 255, 255, 0.7); }
@@ -461,6 +456,11 @@
 
     body.light .divider {
       background-color: rgba(0, 0, 0, 0.15);
+    }
+
+    /* Desktop only: divider 40% narrower (70% -> 42%); mobile unchanged */
+    @media (min-width: 769px) {
+      .divider { width: 42%; }
     }
 
     .social-group {
@@ -539,10 +539,8 @@
               <circle cx="13" cy="10" r="5.2"/>
               <path d="M2.5 28.5 C2.5 21.6 7 17.6 13 17.6 C19 17.6 23.5 21.6 23.5 28.5 Z"/>
               <!-- Plus (separate, no contact) -->
-              <g class="plus-stroke" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round">
-                <line x1="26.5" y1="4.85" x2="26.5" y2="13.15"/>
-                <line x1="22.35" y1="9" x2="30.65" y2="9"/>
-              </g>
+              <rect x="25.65" y="4" width="1.7" height="10" rx="0.85"/>
+              <rect x="21.5" y="8.15" width="10" height="1.7" rx="0.85"/>
             </svg>
             <span class="toggle-label">Follow</span>
           </button>
@@ -558,10 +556,8 @@
               <circle cx="26.75" cy="9.6" r="2.8"/>
               <path d="M22.5 20.5 C22.5 16.3 24.5 14.3 26.75 14.3 C29 14.3 31 16.3 31 20.5 Z"/>
               <!-- Plus (separate, no contact) -->
-              <g class="plus-stroke" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round">
-                <line x1="27" y1="24.15" x2="27" y2="30.85"/>
-                <line x1="23.65" y1="27.5" x2="30.35" y2="27.5"/>
-              </g>
+              <rect x="26.15" y="23.3" width="1.7" height="8.4" rx="0.85"/>
+              <rect x="22.8" y="26.65" width="8.4" height="1.7" rx="0.85"/>
             </svg>
             <span class="toggle-label">Join</span>
           </button>
